@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Opening Dashboard...</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+      .container {
+        text-align: center;
+        padding: 2rem;
+      }
+      .spinner {
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid white;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1.5rem;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      h2 {
+        margin: 0 0 0.5rem 0;
+        font-weight: 600;
+      }
+      p {
+        margin: 0;
+        opacity: 0.9;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="spinner"></div>
+      <h2>Login Successful!</h2>
+      <p>Opening your dashboard...</p>
+    </div>
+
+    <form id="dashboardForm" method="POST" style="display: none">
+      <input type="hidden" name="email" id="emailField" />
+      <input type="hidden" name="password" id="passwordField" />
+    </form>
+
+    <script type="module">
+      // Retrieve the pending login info from session storage
+      const pendingLogin = sessionStorage.getItem("pending_dashboard_login");
+
+      if (!pendingLogin) {
+        // No pending login, redirect to mobile app
+        window.location.href = "./index.html";
+      } else {
+        try {
+          const { base, email, password } = JSON.parse(pendingLogin);
+
+          // Clear the pending login data
+          sessionStorage.removeItem("pending_dashboard_login");
+
+          if (!base) {
+            window.location.href = "./index.html";
+          } else {
+            // Set up the form to post to the backend
+            const form = document.getElementById("dashboardForm");
+            form.action = base.replace(/\/$/, "") + "/login";
+            document.getElementById("emailField").value = email;
+            document.getElementById("passwordField").value = password;
+
+            // Submit after a brief delay to show the success message
+            setTimeout(() => {
+              form.submit();
+            }, 1000);
+          }
+        } catch (e) {
+          console.error("Error processing dashboard login:", e);
+          window.location.href = "./index.html";
+        }
+      }
+    </script>
+  </body>
+</html>

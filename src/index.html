@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en" dir="ltr">
   <head>
     <meta charset="UTF-8" />
@@ -10,23 +10,55 @@
     <meta name="format-detection" content="telephone=no" />
     <meta name="msapplication-tap-highlight" content="no" />
 
-    <script
-      type="module"
-      src="https://unpkg.com/@ionic/pwa-elements@latest/dist/ionicpwaelements/ionicpwaelements.esm.js"
-    ></script>
-    <script
-      nomodule
-      src="https://unpkg.com/@ionic/pwa-elements@latest/dist/ionicpwaelements/ionicpwaelements.js"
-    ></script>
+    <script type="module">
+      // Basic auth guard: if no token, redirect to login page. Uses async API module for secure storage.
+      (async function () {
+        const api = await import("./js/api.js");
+        const token = await api.getStoredToken();
+        if (!token) {
+          window.location.href = "./login.html";
+          return;
+        }
 
-    <link rel="icon" type="image/x-icon" href="./assets/icon/favicon.ico" />
-    <link rel="manifest" href="./manifest.json" />
+        // inject a logout button in the titlebar area for convenience
+        const addLogout = () => {
+          const root = document.body;
+          const btn = document.createElement("button");
+          btn.textContent = "Logout";
+          btn.style.position = "fixed";
+          btn.style.top = "8px";
+          btn.style.right = "12px";
+          btn.style.zIndex = 9999;
+          btn.style.background = "transparent";
+          btn.style.color = "#fff";
+          btn.style.border = "1px solid rgba(255,255,255,0.2)";
+          btn.style.padding = "6px 10px";
+          btn.style.borderRadius = "4px";
+          btn.style.cursor = "pointer";
+          btn.addEventListener("click", async () => {
+            try {
+              const base = api.getApiBase() || "";
+              await fetch((base || "") + "/api/logout", {
+                method: "POST",
+                headers: { Authorization: "Bearer " + token },
+              });
+            } catch (e) {
+              // ignore network errors
+            }
+            await api.clearToken();
+            window.location.href = "./login.html";
+          });
+          root.appendChild(btn);
+        };
+
+        addLogout();
+      })();
+    </script>
+
     <link rel="stylesheet" href="./css/style.css" />
-    <meta name="theme-color" content="#31d53d" />
   </head>
   <body>
     <capacitor-welcome></capacitor-welcome>
-
-    <script src="./js/capacitor-welcome.js" type="module"></script>
+    <script type="module" src="./js/capacitor-welcome.js"></script>
   </body>
 </html>
