@@ -159,7 +159,7 @@ if (form) {
 
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value;
-    const account = document.getElementById('account').value;
+    const account = undefined; // Role/account selection removed
     const remember = document.getElementById('remember').checked;
 
     // use selected API base (or the typed one)
@@ -232,5 +232,33 @@ if (useDemoBtn) {
     }
     // submit form programmatically
     form.dispatchEvent(new Event('submit', { cancelable: true }));
+  });
+}
+
+// Password visibility toggle
+const togglePasswordBtn = document.getElementById('toggle-password');
+const passwordInput = document.getElementById('password');
+const eyeIcon = document.getElementById('eye-icon');
+
+if (togglePasswordBtn && passwordInput) {
+  togglePasswordBtn.addEventListener('click', () => {
+    const isPassword = passwordInput.type === 'password';
+    passwordInput.type = isPassword ? 'text' : 'password';
+    
+    // Update icon
+    if (isPassword) {
+      // Show "eye-slash" icon (password visible)
+      eyeIcon.innerHTML = `
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="12" cy="12" r="3" stroke="#666" stroke-width="2"/>
+        <line x1="1" y1="1" x2="23" y2="23" stroke="#666" stroke-width="2" stroke-linecap="round"/>
+      `;
+    } else {
+      // Show "eye" icon (password hidden)
+      eyeIcon.innerHTML = `
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="12" cy="12" r="3" stroke="#666" stroke-width="2"/>
+      `;
+    }
   });
 }
